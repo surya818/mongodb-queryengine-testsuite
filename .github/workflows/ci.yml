@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mongodb-database-tools
+
+    - name: Create virtual environment
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+        echo ".venv/bin" >> $GITHUB_PATH
+
+    - name: Install Python dependencies
+      run: |
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Wait for MongoDB
+      run: |
+        until mongosh --eval "print('MongoDB is ready')" --quiet; do
+          echo "Waiting for MongoDB..."
+          sleep 2
+        done
+
+    - name: Setup test database with sample data
+      run: |
+        if [ -f "sampledata.archive" ]; then
+          mongorestore --archive=sampledata.archive --nsInclude="sample_mflix.*"
+          echo "Sample data restored successfully"
+        else
+          echo "Warning: sampledata.archive not found, tests may fail if they require sample data"
+        fi
+
+    - name: Run tests
+      run: |
+        source .venv/bin/activate
+        mkdir -p reports
+        pytest --html=reports/pytest-report.html --self-contained-html -v
+      env:
+        MONGODB_URI: mongodb://localhost:27017
+
+    - name: Upload test reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: |
+          reports/pytest-report.html
+          reports/
+          logs/
+        retention-days: 30
