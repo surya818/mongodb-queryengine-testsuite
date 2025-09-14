@@ -31,11 +31,7 @@ jobs:
 
     - name: Install system dependencies
       run: |
-        sudo apt-get install -y wget gnupg                                                                                      │ │
-        wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -                                       │ │
-        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee         │ │
-        /etc/apt/sources.list.d/mongodb-org-7.0.list                                                                                     │ │
-        sudo apt-get update 
+        sudo apt-get update
         sudo apt-get install -y mongodb-database-tools
 
     - name: Create virtual environment
@@ -70,18 +66,16 @@ jobs:
     - name: Run tests
       run: |
         source .venv/bin/activate
-        mkdir -p reports
-        pytest --html=reports/pytest-report.html --self-contained-html -v
+        make test
       env:
         MONGODB_URI: mongodb://localhost:27017
 
     - name: Upload test reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       if: always()
       with:
         name: test-reports
         path: |
-          reports/pytest-report.html
           reports/
           logs/
         retention-days: 30
