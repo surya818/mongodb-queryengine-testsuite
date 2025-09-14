@@ -32,7 +32,6 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y mongodb-database-tools
 
     - name: Create virtual environment
       run: |
@@ -66,7 +65,8 @@ jobs:
     - name: Run tests
       run: |
         source .venv/bin/activate
-        make test
+        mkdir -p reports
+        pytest --html=reports/pytest-report.html --self-contained-html -v
       env:
         MONGODB_URI: mongodb://localhost:27017
 
@@ -76,6 +76,7 @@ jobs:
       with:
         name: test-reports
         path: |
+          reports/pytest-report.html
           reports/
           logs/
         retention-days: 30
