@@ -1,0 +1,4 @@
+pymongo==4.7.1
+pytest==7.4.0
+pyyaml==6.0.2
+pytest-html==4.1.1
