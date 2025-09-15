@@ -53,6 +53,11 @@ jobs:
           sleep 2
         done
 
+    - name: Download sample data
+      run: |
+        curl https://atlas-education.s3.amazonaws.com/sampledata.archive -o sampledata.archive
+        echo "Sample data downloaded successfully"
+
     - name: Setup test database with sample data
       run: |
         if [ -f "sampledata.archive" ]; then
