@@ -1,6 +1,6 @@
 # MongoDB Query Engine Test Automation Suite
 
-A comprehensive test automation framework for MongoDB Query Engine functionality validation and performance testing.
+A comprehensive test automation framework for MongoDB Query Engine functionality validation
 
 ## 🏗️ Project Structure
 
@@ -18,8 +18,6 @@ mongodb-testsuite/
 │   └── utils/              # Shared utilities
 ├── config/                 # Configuration files
 ├── data/                   # Test data and fixtures
-├── docs/                   # Documentation
-├── logs/                   # Test execution logs
 └── reports/               # Test reports and artifacts
 ```
 
@@ -86,9 +84,20 @@ pytest -v
 
 ## 📊 Test Categories
 
-- **Unit Tests**: Fast, isolated tests of individual components
 - **Integration Tests**: Tests that verify component interactions and database operations
-- **Performance Tests**: Load and performance validation tests
+
+## 📊 Regression Suite (Github Actions)
+
+- **Runs on**: Ubuntu, but we can configure for many OSes
+- **How is setup done**: Mongo db is installed, verified for startup
+- **Test Data**: All the tests are based on the movie database sample, sample_mflix database
+- **Reporting**: pytest-html creates a detailed report with console logging too. Here's an example test report
+<img width="1720" height="808" alt="image" src="https://github.com/user-attachments/assets/babb8ba6-eedc-4ee7-8ee6-16ef98cde1f7" />
+
+## 🛠️ Current Test coverage
+- **Query Parsing**: Tests covering parsing span across different mql syntax
+- **Query Selection/Optimization**: Tests covering Execution plans, Winning plans, COLLSCAN vs IDXSCAN, caching, query shapes 
+
 
 ## 🛠️ Development
 
